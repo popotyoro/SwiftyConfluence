@@ -7,49 +7,63 @@
 
 import Foundation
 import SwiftyAtlassian
-import Confluence
-import Model
 
-public extension Atlassian.Confluence where Infrastructure == Server, Category == Content {
-    func create(page: Page) {
-        let body: [String: Any] = {
-            var body: [String: Any] = [:]
-            body["type"] = "page"
-            body["title"] = page.title
-            body["space"] = ["key": page.spaceKey]
-            if let ancestorsKey = page.ancestorsKey {
-                body["ancestors"] = [["id": ancestorsKey]]
-            }
-            body["body"] = ["storage": ["value": page.body, "representation": "storage"]]
-            return body
-        }()
+public protocol ConfluenceAPI {}
 
-        let semaphore = DispatchSemaphore(value: 0)
-        var request = URLRequest(url: page.url)
+public extension Atlassian.Confluence {
+    struct AccessMode: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Audit: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Content: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct ContentBody: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Group: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct LongTask: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Search: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Space: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct User: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+}
 
-        request.allHTTPHeaderFields = header
-        request.httpMethod = "POST"
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            defer { semaphore.signal() }
-
-            guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
-                print("⛔️ not found status code")
-                return
-            }
-
-            if (200...203).contains(statusCode) {
-                print("✅ \(String(describing: response))")
-            } else {
-                print("🚫 statusCode: \(statusCode)")
-                if let error = error {
-                    print("🚨 error: \(error)")
-                }
-            }
-        }
-
-        task.resume()
-        semaphore.wait()
+public extension Atlassian.Confluence where Infrastructure == Cloud {
+    struct Experimental: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Relation: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Settings: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
+    }
+    struct Template: APICategory & ConfluenceAPI {
+        public let config: Config
+        public init(withAuth config: Config) { self.config = config }
     }
 }
